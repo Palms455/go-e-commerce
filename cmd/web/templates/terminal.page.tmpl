@@ -6,6 +6,7 @@ Virtual terminal
 {{define "content"}}
 <h2 class="mt-3 text-center">Virtual terminal</h2>
 <hr>
+<div class="alert alert-danger text-center d-none" id="card-messages"> </div>
 
 <form action="/payment-succeeded" method="post"
     name="charge-form" id="charge-form"
@@ -13,13 +14,88 @@ Virtual terminal
     autocomplete="off" novalidate="">
 
     <div class="mb-3">
-        <label for="amount" class="form-labe">Amount</label>
+        <label for="amount" class="form-label">Amount</label>
         <input type="text" class="form-control" id="amount" name="amount"
             required="" autocomplete="amount-new">
     </div>
+        <div class="mb-3">
+            <label for="cardholder-name" class="form-label">Cardholder Name</label>
+            <input type="text" class="form-control" id="cardholder-name" name="cardholder-name"
+                required="" autocomplete="cardholder-name-new">
+        </div>
+        <div class="mb-3">
+            <label for="cardholder-email" class="form-label">Cardholder Email</label>
+            <input type="text" class="form-control" id="cardholder-email" name="cardholder-email"
+                required="" autocomplete="cardholder-email-new">
+        </div>
+        <div class="mb-3">
+            <label for="card-element" class="form-label">Credit Card</label>
+            <div id="card-element" class="form-control"></div>
+            <div class="alert-danger text-center" id="card-errors" role="alert"></div>
+            <div class="alert-success text-center" id="card-success" role="alert"></div>
+        </div>
+        <hr>
+        <a id="pay-button" href="javascript:void(0)" class="btn btn-primary" onclick="val()">Charge Card</a>
+        <div id="process-payment" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visally-hidden">Loading...</span>
+            </div>
+        </div>
 </form>
 {{end}}
 
 {{define "js"}}
+    <script src="https://js.stripe.com/v3/"><script>
+    <script>console.log("hello base");</script>
+    <script>
+    console.log("hello");
+    let card;
+    let stripe;
+    const cardMessages = document.getElementById("card-messages")
+    const payButton = document.getElementById("pay-button")
+    const processing = document.getElementById("process-payment")
 
+    stripe = Stripe('pk_test_51Kt0nIApOaLfBfcPriPQ8L8CUECobbTvScjNajqEperR8f950u1kdMEHXd4hmJ0pMWLc9IjKUpUQZPqiZuajiOoU00PWz2hPTU');
+
+    function hidePayButton() {
+        payButton.classList.add("d-none");
+        processing.classList.remove("d-none");
+    };
+
+    function val() {
+        let form = document.getElementById("charge-form");
+        if (form.checkValidity() === false) {
+            this.event.preventDefault();
+            this.event.stopPropagation();
+            form.classList.add("was-validated");
+            return;
+        }
+        form.classList.add("was-validated");
+        hidePayButton();
+    };
+    (function(){
+        const elements = stripe.elements();
+        const style = {
+            base: {
+                fontSize: '16px',
+                lineHeight: '24px'
+            }
+        };
+        card = elements.create('card', {
+            style:style,
+            hidPostalCode: true,
+        });
+        card.mount("#card-element");
+
+        card.addEventListener('change', function(event) {
+            var displayError = document.getElementById("card-errors");
+            if (event.error) {
+            displayError.classList.remove('d-none');
+            } else {
+                displayError.classList.add('d-none');
+                displayError.textContent = '';
+            }
+        });
+    })();
+    </script>
 {{end}}

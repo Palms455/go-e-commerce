@@ -1,15 +1,14 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"flag"
 	"time"
 )
-
 const version = "0.0.1"
 const cssVersion = "1"
 
@@ -41,16 +40,16 @@ func (app *application) serve() error {
 		ReadHeaderTimeout: 5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 	}
-	app.infoLog.Printf(fmt.Sprintf("Start http server in %s mode on port %d", app.config.env, app.config.port))
+	app.infoLog.Printf(fmt.Sprintf("Start backend server in %s mode on port %d", app.config.env, app.config.port))
 
 	return srv.ListenAndServe()
 }
 
-func main(){
+
+func main() {
 	var cfg config
-	flag.IntVar(&cfg.port, "port", 5000, "Port to listen on")
+	flag.IntVar(&cfg.port, "port", 5001, "Port to listen on")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment: dev or prod")
-	flag.StringVar(&cfg.api, "api", "http://localhost:5001", "Api url")
 
 	flag.Parse()
 
@@ -60,18 +59,17 @@ func main(){
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	tc := make(map[string]*template.Template)
-
 	app := &application{
 		config: cfg,
 		infoLog: infoLog,
 		errorLog: errorLog,
-		templateCache: tc,
-		version: version,
 	}
+
 	err := app.serve()
 	if err != nil {
-		app.errorLog.Printf("Server error: %s", err)
-		return
+		app.errorLog.Printf("error in backend: %s", err)
+		os.Exit(1)
 	}
+
+
 }

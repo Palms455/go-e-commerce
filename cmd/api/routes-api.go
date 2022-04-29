@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (app *application) routes() http.Handler {
+func (app *application) Routes() http.Handler {
 	mux := chi.NewRouter()
 
 	// Разрешение CORS запросов
@@ -16,6 +16,8 @@ func (app *application) routes() http.Handler {
 		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		MaxAge: 300,
 	}))
+
+	mux.Get("/api/payment-intent", app.GetPaymentIntent)
 
 	return mux
 }

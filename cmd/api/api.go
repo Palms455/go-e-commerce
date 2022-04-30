@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
 	"time"
+	"webapp/internal/driver"
 )
 func init() {
 	// loads values from .env into the system
@@ -59,10 +60,18 @@ func main() {
 
 	cfg.stripe.key, _ = os.LookupEnv("STRIPE_KEY")
 	cfg.stripe.secret, _ = os.LookupEnv("STRIPE_SECRET")
+	cfg.db.dsn, _ = os.LookupEnv("DSN")
 
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	defer conn.Close()
 
 	app := &application{
 		config: cfg,
@@ -71,7 +80,7 @@ func main() {
 		version: version,
 	}
 
-	err := app.serve()
+	err = app.serve()
 	if err != nil {
 		app.errorLog.Printf("error in backend: %s", err)
 		os.Exit(1)

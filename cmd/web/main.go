@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"webapp/internal/driver"
 )
 
 const version = "0.0.1"
@@ -65,9 +66,17 @@ func main(){
 
 	cfg.stripe.key, _ = os.LookupEnv("STRIPE_KEY")
 	cfg.stripe.secret, _ = os.LookupEnv("STRIPE_SECRET")
+	cfg.db.dsn, _ = os.LookupEnv("DSN")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	conn, err := driver.OpenDB(cfg.db.dsn)
+	if err != nil {
+		errorLog.Println(err)
+	}
+
+	defer conn.Close()
 
 	tc := make(map[string]*template.Template)
 
@@ -78,7 +87,7 @@ func main(){
 		templateCache: tc,
 		version: version,
 	}
-	err := app.serve()
+	err = app.serve()
 	if err != nil {
 		app.errorLog.Printf("Server error: %s", err)
 		return

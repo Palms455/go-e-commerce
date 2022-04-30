@@ -68,9 +68,9 @@ func (app *application) renderTemplate(w http.ResponseWriter, r *http.Request, p
 func (app *application) parseTemplate(partials []string, page, templateToRender string) (*template.Template, error) {
 	var tmpl *template.Template
 	var err error
-	if len(partials) >0 {
-		for i, _ := range partials {
-			partials[i] = fmt.Sprintf("templates/%s.partial.rmpl")
+	if len(partials) > 0 {
+		for i, name := range partials {
+			partials[i] = fmt.Sprintf("templates/%s.partial.gohtml", name)
 		}
 	}
 	if len(partials) >0 {

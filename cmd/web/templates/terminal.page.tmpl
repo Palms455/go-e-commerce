@@ -19,14 +19,14 @@ Virtual terminal
             required="" autocomplete="amount-new">
     </div>
         <div class="mb-3">
-            <label for="cardholder-name" class="form-label">Cardholder Name</label>
-            <input type="text" class="form-control" id="cardholder-name" name="cardholder-name"
-                required="" autocomplete="cardholder-name-new">
+            <label for="cardholder_name" class="form-label">Cardholder Name</label>
+            <input type="text" class="form-control" id="cardholder_name" name="cardholder_name"
+                required="" autocomplete="cardholder_name-new">
         </div>
         <div class="mb-3">
-            <label for="cardholder-email" class="form-label">Cardholder Email</label>
-            <input type="text" class="form-control" id="cardholder-email" name="cardholder-email"
-                required="" autocomplete="cardholder-email-new">
+            <label for="cardholder_email" class="form-label">Cardholder Email</label>
+            <input type="text" class="form-control" id="cardholder_email" name="cardholder_email"
+                required="" autocomplete="cardholder_email-new">
         </div>
         <div class="mb-3">
             <label for="card-element" class="form-label">Credit Card</label>
@@ -38,7 +38,7 @@ Virtual terminal
         <a id="pay-button" href="javascript:void(0)" class="btn btn-primary" onclick="val()">Charge Card</a>
         <div id="process-payment" class="text-center d-none">
             <div class="spinner-border text-primary" role="status">
-                <span class="visally-hidden">Loading...</span>
+                <span class="visally-hidden"></span>
             </div>
         </div>
         <input type="hidden" name="payment_intent" id="payment_intent">
@@ -65,6 +65,26 @@ Virtual terminal
         payButton.classList.add("d-none");
         processing.classList.remove("d-none");
     };
+
+    function showPayButtons() {
+        payButton.classList.remove("d-none");
+        processing.classList.add("d-none");
+    };
+
+    function showCardError(msg) {
+        cardMessages.classList.add("alert-danger");
+        cardMessages.classList.remove("alert-success");
+        cardMessages.classList.remove("d-none");
+        cardMessages.innerText = msg;
+    };
+
+    function showCardSuccess(msg) {
+        cardMessages.classList.add("alert-success");
+        cardMessages.classList.remove("alert-danger");
+        cardMessages.classList.remove("d-none");
+        cardMessages.innerText = "Transaction successful";
+    };
+
 
     function val() {
         let form = document.getElementById("charge-form");
@@ -98,11 +118,37 @@ Virtual terminal
                 let data;
                 try {
                     data = JSON.parse(response);
-                    console.log(data);
-                } catch (err) {
-                    console.log(err)
+                    stripe.confirmCardPayment(
+                        data.client_secret,{
+                        payment_method: {
+                            card: card,
+                            billing_details: {
+                                name: document.getElementById("cardholder_name").value
+                            },
+                        },
+                    }).then(function(result) {
+                        if (result.error) {
+                            showCardError(result.error.message);
+                            showPayButtons();
+                        } else if (result.paymentIntent) {
+                            if (result.paymentIntent.status === "succeeded") {
+                                document.getElementById("payment_method").value = result.paymentIntent.payment_method_types[0]
+                                document.getElementById("payment_intent").value = result.paymentIntent.id
+                                document.getElementById("payment_amount").value = result.paymentIntent.amount
+                                document.getElementById("payment_currency").value = result.paymentIntent.currency
+                                processing.classList.add("d-none");
+                                showCardSuccess();
+                                document.getElementById("charge-form").submit();
 
-                }
+                            }
+                        }
+                    })
+                } catch (err) {
+                    console.log(err);
+                    showCardError("Invalid response from payment gateway!");
+                    showPayButtons();
+
+                };
 
             })
     };

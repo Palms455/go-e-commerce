@@ -38,7 +38,7 @@ func (app *application) renderTemplate(w http.ResponseWriter, r *http.Request, p
 	var tmpl *template.Template
 	var err error
 
-	templateToRender := fmt.Sprintf("templates/%s.page.tmpl", page)
+	templateToRender := fmt.Sprintf("templates/%s.page.gohtml", page)
 
 	_, templateMap := app.templateCache[templateToRender]
 
@@ -74,9 +74,9 @@ func (app *application) parseTemplate(partials []string, page, templateToRender 
 		}
 	}
 	if len(partials) >0 {
-		tmpl, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "templates/base.layout.tmpl", strings.Join(partials, ","), templateToRender)
+		tmpl, err = template.New(fmt.Sprintf("%s.page.gohtml", page)).Funcs(functions).ParseFS(templateFS, "templates/base.layout.gohtml", strings.Join(partials, ","), templateToRender)
 	} else {
-		tmpl, err = template.New(fmt.Sprintf("%s.page.tmpl", page)).Funcs(functions).ParseFS(templateFS, "templates/base.layout.tmpl", templateToRender)
+		tmpl, err = template.New(fmt.Sprintf("%s.page.gohtml", page)).Funcs(functions).ParseFS(templateFS, "templates/base.layout.gohtml", templateToRender)
 	}
 	if err != nil {
 		app.errorLog.Println(err)

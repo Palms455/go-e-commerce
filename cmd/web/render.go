@@ -9,7 +9,7 @@ import (
 )
 
 type templateData struct {
-	StringMat map[string]string
+	StringMap map[string]string
 	IntMap map[string]int
 	FloatMap map[string]float32
 	Data map[string]interface{}
@@ -18,7 +18,7 @@ type templateData struct {
 	Warning string
 	Errr string
 	IsAutenticated string
-	AI string
+	API string
 	CSSVersion string
 }
 
@@ -28,6 +28,7 @@ var functions = template.FuncMap{
 //go:embed templates
 var templateFS embed.FS
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
+	td.API = app.config.api
 	return td
 
 }

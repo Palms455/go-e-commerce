@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/joho/godotenv"
 	"html/template"
 	"log"
 	"net/http"
@@ -12,6 +13,14 @@ import (
 
 const version = "0.0.1"
 const cssVersion = "1"
+
+
+func init() {
+	// loads values from .env into the system
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
 
 type config struct{
 	port int
@@ -54,8 +63,8 @@ func main(){
 
 	flag.Parse()
 
-	cfg.stripe.key = os.Getenv("STRIPE_KEY")
-	cfg.stripe.secret = os.Getenv("STRIPE_SECRET")
+	cfg.stripe.key, _ = os.LookupEnv("STRIPE_KEY")
+	cfg.stripe.secret, _ = os.LookupEnv("STRIPE_SECRET")
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)

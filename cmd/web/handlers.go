@@ -1,14 +1,13 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"webapp/internal/models"
+)
 
 func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
-	stringMap := make(map[string]string)
-	stringMap["public_key"] = app.config.stripe.key
 
-	if err := app.renderTemplate(w, r, "terminal", &templateData{
-		StringMap: stringMap,
-	}, "stripe-js"); err != nil {
+	if err := app.renderTemplate(w, r, "terminal", &templateData{}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 
 	}
@@ -47,11 +46,20 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 
 // display buy one widget
 func (app *application) ChargeOnce(w http.ResponseWriter, r *http.Request) {
-	stringMap := make(map[string]string)
-	stringMap["public_key"] = app.config.stripe.key
+	widget := models.Widget{
+		ID : 1,
+		Name: "Custom Widget",
+		Description: "A nice widget",
+		InventoryLevel: 10,
+		Price: 500,
+	}
+
+	dataMap := map[string]interface{}{
+		"widget": widget,
+	}
 
 	if err := app.renderTemplate(w, r, "buy-once", &templateData{
-		StringMap: stringMap,
+		Data: dataMap,
 	}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
 		return

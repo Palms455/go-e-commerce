@@ -10,11 +10,11 @@ import (
 	"os"
 	"time"
 	"webapp/internal/driver"
+	"webapp/internal/models"
 )
 
 const version = "0.0.1"
 const cssVersion = "1"
-
 
 func init() {
 	// loads values from .env into the system
@@ -23,40 +23,41 @@ func init() {
 	}
 }
 
-type config struct{
-	port int
+type config struct {
+	port     int
 	env, api string
-	db struct{
+	db       struct {
 		dsn string
 	}
-	stripe struct{
+	stripe struct {
 		secret, key string
 	}
 }
 
-type application struct{
-	config config
-	infoLog *log.Logger
-	errorLog *log.Logger
+type application struct {
+	config        config
+	infoLog       *log.Logger
+	errorLog      *log.Logger
 	templateCache map[string]*template.Template
-	version string
+	version       string
+	DB            models.DBModel
 }
 
 func (app *application) serve() error {
 	srv := &http.Server{
-		Addr: fmt.Sprintf(":%d", app.config.port),
-		Handler: app.routes(),
-		IdleTimeout: 30 * time.Second,
-		ReadTimeout: 10 * time.Second,
+		Addr:              fmt.Sprintf(":%d", app.config.port),
+		Handler:           app.routes(),
+		IdleTimeout:       30 * time.Second,
+		ReadTimeout:       10 * time.Second,
 		ReadHeaderTimeout: 5 * time.Second,
-		WriteTimeout: 5 * time.Second,
+		WriteTimeout:      5 * time.Second,
 	}
 	app.infoLog.Printf(fmt.Sprintf("Start http server in %s mode on port %d", app.config.env, app.config.port))
 
 	return srv.ListenAndServe()
 }
 
-func main(){
+func main() {
 	var cfg config
 	flag.IntVar(&cfg.port, "port", 5000, "Port to listen on")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment: dev or prod")
@@ -81,11 +82,12 @@ func main(){
 	tc := make(map[string]*template.Template)
 
 	app := &application{
-		config: cfg,
-		infoLog: infoLog,
-		errorLog: errorLog,
+		config:        cfg,
+		infoLog:       infoLog,
+		errorLog:      errorLog,
 		templateCache: tc,
-		version: version,
+		version:       version,
+		DB:            models.DBModel{DB: conn},
 	}
 	err = app.serve()
 	if err != nil {

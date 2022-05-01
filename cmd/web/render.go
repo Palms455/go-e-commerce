@@ -20,15 +20,24 @@ type templateData struct {
 	IsAutenticated string
 	API string
 	CSSVersion string
+	StripePublishKey string
+	StripeSecretKey string
 }
 
 var functions = template.FuncMap{
+	"formatCurrency": formatCurrency,
+}
 
+func formatCurrency(val int) string {
+	format_value := float32(val/100)
+	return fmt.Sprintf("$%.2f", format_value)
 }
 //go:embed templates
 var templateFS embed.FS
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
 	td.API = app.config.api
+	td.StripeSecretKey = app.config.stripe.secret
+	td.StripePublishKey = app.config.stripe.key
 	return td
 
 }

@@ -5,3 +5,5 @@ start_front:
 	go run ./cmd/web/ STRIPE_SECRET=sk_test_51Kt0nIApOaLfBfcPM8BkHRb9ZcZHZeub8EplltIeIKNnfS738nTJGFiAmcIAVy59yMBokLgWOwzIqhGIu0qPgtoR00uY2xgnQ0 -STRIPE_KEY=pk_test_51Kt0nIApOaLfBfcPriPQ8L8CUECobbTvScjNajqEperR8f950u1kdMEHXd4hmJ0pMWLc9IjKUpUQZPqiZuajiOoU00PWz2hPTU
 
 start: start_back start_front
+
+

@@ -1,0 +1,110 @@
+sql("create schema if not exists products;")
+sql(`
+    create table if not exists products.widgets (
+        id serial primary key,
+        name text default '',
+        description text default '',
+        inventory_level int,
+        price int,
+        created_at date default now(),
+        updated_at date default now()
+    );
+    `
+)
+
+sql (`
+    create table if not exists products.transaction_statuses (
+        id serial primary key,
+        name text,
+        created_at date default now(),
+        updated_at date default now()
+
+    );
+`)
+
+sql(`
+    create table if not exists products.transactions (
+        id serial primary key,
+        amount int,
+        currency text,
+        last_four text,
+        bank_return_code text,
+        transaction_status_id int,
+        created_at date default now(),
+        updated_at date default now()
+    );`
+)
+
+
+add_foreign_key("products.transactions", "transaction_status_id", {"products.transaction_statuses": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+
+sql(`
+    create table if not exists products.orders (
+        id serial primary key,
+        widget_id int,
+        transaction_id int,
+        status_id int,
+        quantity int,
+        amount int,
+        created_at date default now(),
+        updated_at date default now()
+    );`
+)
+
+add_foreign_key("products.orders", "widget_id", {"products.widgets": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+add_foreign_key("products.orders", "transaction_id", {"products.transactions": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+sql(`
+    create table if not exists products.statuses (
+        id serial primary key,
+        name text,
+        created_at date default now(),
+        updated_at date default now()
+    );`
+)
+
+add_foreign_key("products.orders", "status_id", {"products.statuses": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+sql(`
+    create table if not exists products.users (
+        id serial primary key,
+        first_name varchar(255),
+        last_name varchar(255),
+        email text,
+        password text,
+        created_at date default now(),
+        updated_at date default now()
+    );`
+)
+
+
+
+
+
+sql("insert into products.users (first_name, last_name, email, password) values ('Admin','User','admin@example.com', '$2a$12$VR1wDmweaF3ZTVgEHiJrNOSi8VcS4j0eamr96A/7iOe8vlum3O3/q');")
+
+sql("insert into products.transaction_statuses (name) values ('Pending');")
+sql("insert into products.transaction_statuses (name) values ('Cleared');")
+sql("insert into products.transaction_statuses (name) values ('Declined');")
+sql("insert into products.transaction_statuses (name) values ('Refunded');")
+sql("insert into products.transaction_statuses (name) values ('Partially refunded');")
+
+sql("insert into products.widgets (name, description, inventory_level, price, created_at, updated_at) values ('Widget', 'A very nice widget.', 10, 1000, now(), now());")
+
+sql("insert into products.statuses (name) values ('Cleared');")
+sql("insert into products.statuses (name) values ('Refunded');")
+sql("insert into products.statuses (name) values ('Cancelled');")

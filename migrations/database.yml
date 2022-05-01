@@ -1,0 +1,8 @@
+development:
+  dialect: postgres
+  database: gocommerce
+  user: postgres
+  password: postgres
+  host: localhost
+  port: 5433
+  pool: 5

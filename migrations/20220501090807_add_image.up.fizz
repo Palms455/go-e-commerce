@@ -1,0 +1,1 @@
+sql ("alter table products.widgets add column image text default ''")

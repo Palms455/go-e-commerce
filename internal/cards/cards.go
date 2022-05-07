@@ -1,6 +1,7 @@
 package cards
 
 import (
+	"github.com/stripe/stripe-go/v72/paymentmethod"
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/paymentintent"
 )
@@ -11,10 +12,10 @@ type Card struct {
 
 type Transaction struct {
 	TransactionStatusID int
-	Amount int
-	Currency string
-	LastFour string
-	BankReturnCode string
+	Amount              int
+	Currency            string
+	LastFour            string
+	BankReturnCode      string
 }
 
 func (c *Card) Charge(currency string, amount int) (*stripe.PaymentIntent, string, error) {
@@ -26,7 +27,7 @@ func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.Payment
 
 	// create payment intent
 	params := &stripe.PaymentIntentParams{
-		Amount: stripe.Int64(int64(amount)),
+		Amount:   stripe.Int64(int64(amount)),
 		Currency: stripe.String(currency),
 	}
 
@@ -43,7 +44,29 @@ func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.Payment
 	return pi, "", err
 }
 
+// GetPaymentMethod get payment method by payment intend id
+func(c *Card) GetPaymentMethod(s string) (*stripe.PaymentMethod, error) {
+	stripe.Key = c.Secret
 
+	pm, err := paymentmethod.Get(s, nil)
+	if err != nil {
+		return nil ,err
+	}
+	return pm, nil
+}
+
+// GetPaymentIntent gets an existing payment intent by id
+func (c *Card) RetrievePaymentIntent(id string) (*stripe.PaymentIntent, error){
+	stripe.Key = c.Secret
+
+	pi, err := paymentintent.Get(id, nil)
+	if err != nil {
+		return nil, err
+	}
+	return pi, err
+}
+
+// cardErrorMessage returns verbose error for card messages
 func cardErrorMessage(code stripe.ErrorCode) string {
 	var msg = ""
 	switch code {

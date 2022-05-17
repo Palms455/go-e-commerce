@@ -56,7 +56,11 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		_, err = w.Write(out)
+		if err != nil {
+			app.errorLog.Println(err)
+			return
+		}
 	} else {
 		j := jsonResponse{
 			OK: false,
@@ -68,7 +72,11 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 			app.errorLog.Println(err)
 		}
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		_, err = w.Write(out)
+		if err != nil {
+			app.errorLog.Println(err)
+			return
+		}
 
 	}
 }
@@ -88,5 +96,9 @@ func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	_, err = w.Write(out)
+	if err != nil {
+		app.errorLog.Println(err)
+		return
+	}
 }

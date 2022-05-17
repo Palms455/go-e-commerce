@@ -1,9 +1,9 @@
 package cards
 
 import (
-	"github.com/stripe/stripe-go/v72/paymentmethod"
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/paymentintent"
+	"github.com/stripe/stripe-go/v72/paymentmethod"
 )
 
 type Card struct {
@@ -55,7 +55,7 @@ func(c *Card) GetPaymentMethod(s string) (*stripe.PaymentMethod, error) {
 	return pm, nil
 }
 
-// GetPaymentIntent gets an existing payment intent by id
+// RetrievePaymentIntent gets an existing payment intent by id
 func (c *Card) RetrievePaymentIntent(id string) (*stripe.PaymentIntent, error){
 	stripe.Key = c.Secret
 

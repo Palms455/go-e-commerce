@@ -30,6 +30,44 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: customers; Type: TABLE; Schema: products; Owner: postgres
+--
+
+CREATE TABLE products.customers (
+    id integer NOT NULL,
+    first_name character varying(255),
+    last_name character varying(255),
+    email text,
+    created_at date DEFAULT now(),
+    updated_at date DEFAULT now()
+);
+
+
+ALTER TABLE products.customers OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE; Schema: products; Owner: postgres
+--
+
+CREATE SEQUENCE products.customers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE products.customers_id_seq OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE OWNED BY; Schema: products; Owner: postgres
+--
+
+ALTER SEQUENCE products.customers_id_seq OWNED BY products.customers.id;
+
+
+--
 -- Name: orders; Type: TABLE; Schema: products; Owner: postgres
 --
 
@@ -153,7 +191,9 @@ CREATE TABLE products.transactions (
     bank_return_code text,
     transaction_status_id integer,
     created_at date DEFAULT now(),
-    updated_at date DEFAULT now()
+    updated_at date DEFAULT now(),
+    expiry_month integer DEFAULT 0,
+    expiry_year integer DEFAULT 0
 );
 
 
@@ -272,6 +312,13 @@ CREATE TABLE public.schema_migration (
 ALTER TABLE public.schema_migration OWNER TO postgres;
 
 --
+-- Name: customers id; Type: DEFAULT; Schema: products; Owner: postgres
+--
+
+ALTER TABLE ONLY products.customers ALTER COLUMN id SET DEFAULT nextval('products.customers_id_seq'::regclass);
+
+
+--
 -- Name: orders id; Type: DEFAULT; Schema: products; Owner: postgres
 --
 
@@ -311,6 +358,14 @@ ALTER TABLE ONLY products.users ALTER COLUMN id SET DEFAULT nextval('products.us
 --
 
 ALTER TABLE ONLY products.widgets ALTER COLUMN id SET DEFAULT nextval('products.widgets_id_seq'::regclass);
+
+
+--
+-- Name: customers customers_pkey; Type: CONSTRAINT; Schema: products; Owner: postgres
+--
+
+ALTER TABLE ONLY products.customers
+    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
 
 
 --

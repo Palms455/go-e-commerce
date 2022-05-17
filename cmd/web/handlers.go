@@ -7,11 +7,17 @@ import (
 	"webapp/internal/cards"
 )
 
-func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
+// HomePage displays the home page
+func (app *application) HomePage(w http.ResponseWriter, r *http.Request) {
+	if err := app.renderTemplate(w, r, "home", &templateData{}); err != nil {
+		app.errorLog.Println(err)
+	}
+}
 
+// VirtualTerminal displays the virtual terminal page
+func (app *application) VirtualTerminal(w http.ResponseWriter, r *http.Request) {
 	if err := app.renderTemplate(w, r, "terminal", &templateData{}, "stripe-js"); err != nil {
 		app.errorLog.Println(err)
-
 	}
 }
 

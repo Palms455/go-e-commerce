@@ -79,7 +79,8 @@ CREATE TABLE products.orders (
     quantity integer,
     amount integer,
     created_at date DEFAULT now(),
-    updated_at date DEFAULT now()
+    updated_at date DEFAULT now(),
+    customer_id integer
 );
 
 
@@ -421,6 +422,14 @@ ALTER TABLE ONLY products.widgets
 --
 
 CREATE UNIQUE INDEX schema_migration_version_idx ON public.schema_migration USING btree (version);
+
+
+--
+-- Name: orders fk_customer; Type: FK CONSTRAINT; Schema: products; Owner: postgres
+--
+
+ALTER TABLE ONLY products.orders
+    ADD CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES products.customers(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

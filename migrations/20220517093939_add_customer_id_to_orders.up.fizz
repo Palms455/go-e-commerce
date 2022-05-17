@@ -1,0 +1,3 @@
+sql ("alter table products.orders add column customer_id integer")
+sql ("alter table products.orders add constraint fk_customer foreign key(customer_id) references products.customers(id) on delete cascade on update cascade")
+

@@ -40,7 +40,7 @@ type Order struct {
 	ID            int       `json:"id"`
 	WidgetID      int       `json:"widget_id"`
 	TransactionID int       `json:"transaction_id"`
-	CustomerID int       	`json:"customer_id"`
+	CustomerID    int       `json:"customer_id"`
 	StatusId      int       `json:"status_id"`
 	Quantity      int       `json:"quantity"`
 	Amount        int       `json:"amount"`
@@ -70,7 +70,9 @@ type Transaction struct {
 	Amount              int       `json:"amount"`
 	Currency            string    `json:"currency"`
 	LastFour            string    `json:"last_four"`
-	BankReturnCode      int       `json:"bank_return_code"`
+	ExpiryYear          int       `json:"expiry_year"`
+	ExpiryMonth         int       `json:"expiry_month"`
+	BankReturnCode      string    `json:"bank_return_code"`
 	TransactionStatusID int       `json:"transaction_status_id"`
 	CreatedAt           time.Time `json:"-"`
 	UpdateAt            time.Time `json:"-"`
@@ -132,11 +134,11 @@ func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 
 	SQL := `
 		insert into products.transactions (
-			amount, currency, last_four, bank_return_code, transaction_status_id, create_at, updated_at
+			amount, currency, last_four, bank_return_code, transaction_status_id, created_at, updated_at
 		)
-		values ($1, $2, $3, $4, $5, $6, $7)
-	`
-	result, err := m.DB.ExecContext(ctx, SQL,
+		values ($1, $2, $3, $4, $5, $6, $7) returning id`
+	var id int
+	result := m.DB.QueryRowContext(ctx, SQL,
 		txn.Amount,
 		txn.Currency,
 		txn.LastFour,
@@ -145,16 +147,15 @@ func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		time.Now(),
 		time.Now(),
 	)
+	err := result.Scan(&id)
 	if err != nil {
 		return 0, err
 	}
-	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}
-	return int(id), nil
+	return id, nil
 }
-
 
 // InsertOrder insert order and returns id
 func (m *DBModel) InsertOrder(order Order) (int, error) {
@@ -165,9 +166,10 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		insert into products.orders (
 			widget_id, transaction_id, status_id, quantity, amount, created_at, updated_at
 		)
-		values ($1, $2, $3, $4, $5, $6, $7)
+		values ($1, $2, $3, $4, $5, $6, $7) returning id
 	`
-	result, err := m.DB.ExecContext(ctx, SQL,
+	var id int
+	result := m.DB.QueryRowContext(ctx, SQL,
 		order.WidgetID,
 		order.TransactionID,
 		order.StatusId,
@@ -176,12 +178,34 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		time.Now(),
 		time.Now(),
 	)
+
+	err := result.Scan(&id)
 	if err != nil {
 		return 0, err
 	}
-	id, err := result.LastInsertId()
+	return id, nil
+}
+
+// InsertCustomer insert customer and returns id
+func (m *DBModel) InsertCustomer(c Customers) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	var id int
+	SQL := `
+		insert into products.customers (
+			first_name, last_name, email, created_at, updated_at
+		)
+		values ($1, $2, $3, $4, $5) returning id`
+	result := m.DB.QueryRowContext(ctx, SQL,
+		c.FirstName,
+		c.LastName,
+		c.Email,
+		time.Now(),
+		time.Now(),
+	)
+	err := result.Scan(&id)
 	if err != nil {
 		return 0, err
 	}
-	return int(id), nil
+	return id, nil
 }

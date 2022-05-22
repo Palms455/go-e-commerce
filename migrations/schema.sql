@@ -194,7 +194,9 @@ CREATE TABLE products.transactions (
     created_at date DEFAULT now(),
     updated_at date DEFAULT now(),
     expiry_month integer DEFAULT 0,
-    expiry_year integer DEFAULT 0
+    expiry_year integer DEFAULT 0,
+    payment_intent text DEFAULT ''::text,
+    payment_method text DEFAULT ''::text
 );
 
 

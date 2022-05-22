@@ -72,6 +72,8 @@ type Transaction struct {
 	LastFour            string    `json:"last_four"`
 	ExpiryYear          int       `json:"expiry_year"`
 	ExpiryMonth         int       `json:"expiry_month"`
+	PaymentIntent string `json:"payment_intent"`
+	PaymentMethod string `json:"payment_mehod"`
 	BankReturnCode      string    `json:"bank_return_code"`
 	TransactionStatusID int       `json:"transaction_status_id"`
 	CreatedAt           time.Time `json:"-"`
@@ -134,9 +136,10 @@ func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 
 	SQL := `
 		insert into products.transactions (
-			amount, currency, last_four, bank_return_code, transaction_status_id, created_at, updated_at
+			amount, currency, last_four, bank_return_code, transaction_status_id, payment_intent, payment_method,
+		    expiry_month, expiry_year, created_at, updated_at
 		)
-		values ($1, $2, $3, $4, $5, $6, $7) returning id`
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) returning id`
 	var id int
 	result := m.DB.QueryRowContext(ctx, SQL,
 		txn.Amount,
@@ -144,6 +147,10 @@ func (m *DBModel) InsertTransaction(txn Transaction) (int, error) {
 		txn.LastFour,
 		txn.BankReturnCode,
 		txn.TransactionStatusID,
+		txn.PaymentIntent,
+		txn.PaymentMethod,
+		txn.ExpiryMonth,
+		txn.ExpiryYear,
 		time.Now(),
 		time.Now(),
 	)

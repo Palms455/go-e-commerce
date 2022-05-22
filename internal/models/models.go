@@ -164,9 +164,9 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 
 	SQL := `
 		insert into products.orders (
-			widget_id, transaction_id, status_id, quantity, amount, created_at, updated_at
+			widget_id, transaction_id, status_id, quantity, customer_id, amount, created_at, updated_at
 		)
-		values ($1, $2, $3, $4, $5, $6, $7) returning id
+		values ($1, $2, $3, $4, $5, $6, $7, $8) returning id
 	`
 	var id int
 	result := m.DB.QueryRowContext(ctx, SQL,
@@ -174,6 +174,7 @@ func (m *DBModel) InsertOrder(order Order) (int, error) {
 		order.TransactionID,
 		order.StatusId,
 		order.Quantity,
+		order.CustomerID,
 		order.Amount,
 		time.Now(),
 		time.Now(),

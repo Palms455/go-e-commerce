@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 	"strconv"
@@ -29,7 +30,7 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 		app.errorLog.Println(err)
 		return
 	}
-	firstName := r.Form.Get("first-namename")
+	firstName := r.Form.Get("first-name")
 	lastName := r.Form.Get("last-name")
 	email := r.Form.Get("cardholder_email")
 	paymentIntent := r.Form.Get("payment_intent")
@@ -60,6 +61,7 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	expiryYear := pm.Card.ExpYear
 
 	// create a new customer
+	fmt.Println(lastName)
 	customerID, err := app.SaveCustomer(firstName, lastName, email)
 	if err != nil {
 		app.errorLog.Println(err)
@@ -116,6 +118,8 @@ func (app *application) PaymentSucceeded(w http.ResponseWriter, r *http.Request)
 	data["last_four"] = lastFour
 	data["expiry_month"] = expiryMonth
 	data["expiry_year"] = expiryYear
+	data["first_name"] = firstName
+	data["last_name"] = lastName
 	data["bank_return_code"] = pi.Charges.Data[0].ID
 
 	if err := app.renderTemplate(w, r, "succeeded", &templateData{

@@ -63,7 +63,9 @@ func (app *application) serve() error {
 }
 
 func main() {
-	gob.Register(map[string]interface{}{})
+	//register common var
+	gob.Register(TransactionData{})
+
 	var cfg config
 	flag.IntVar(&cfg.port, "port", 5000, "Port to listen on")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment: dev or prod")

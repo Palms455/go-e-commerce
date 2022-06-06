@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
@@ -62,6 +63,7 @@ func (app *application) serve() error {
 }
 
 func main() {
+	gob.Register(map[string]interface{}{})
 	var cfg config
 	flag.IntVar(&cfg.port, "port", 5000, "Port to listen on")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment: dev or prod")

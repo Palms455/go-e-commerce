@@ -8,7 +8,7 @@ Virtual terminal
 <hr>
 <div class="alert alert-danger text-center d-none" id="card-messages"> </div>
 
-<form action="/payment-succeeded" method="post"
+<form action="/virtual-terminal-payment-succeeded" method="post"
     name="charge-form" id="charge-form"
     class="d-block need-validation charge-form"
     autocomplete="off" novalidate="">
@@ -51,9 +51,9 @@ Virtual terminal
 
 {{define "js"}}
     <script>
-        document.getElementById("charge_amount", function(evt){
+        document.getElementById("charge_amount").addEventListener("change", function(evt){
             if (evt.target.value !== "") {
-                document.getElementById("amount").value = evt.target.value * 100
+                document.getElementById("amount").value = parseInt((evt.target.value * 100), 10);
             } else {
                 document.getElementById("amount").value = 0;
             }

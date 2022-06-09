@@ -31,6 +31,8 @@ type Widget struct {
 	InventoryLevel int       `json:"inventory_level"`
 	Price          int       `json:"price"`
 	Image          string    `json:"image"`
+	IsRecurring    bool      `json:"is_recurring"`
+	PlanID         string    `json:"plan_id"`
 	CreatedAt      time.Time `json:"-"`
 	UpdateAt       time.Time `json:"-"`
 }
@@ -72,8 +74,8 @@ type Transaction struct {
 	LastFour            string    `json:"last_four"`
 	ExpiryYear          int       `json:"expiry_year"`
 	ExpiryMonth         int       `json:"expiry_month"`
-	PaymentIntent string `json:"payment_intent"`
-	PaymentMethod string `json:"payment_mehod"`
+	PaymentIntent       string    `json:"payment_intent"`
+	PaymentMethod       string    `json:"payment_mehod"`
 	BankReturnCode      string    `json:"bank_return_code"`
 	TransactionStatusID int       `json:"transaction_status_id"`
 	CreatedAt           time.Time `json:"-"`
@@ -111,7 +113,7 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 	row := m.DB.QueryRowContext(ctx, `
 		select 
 		    w.id, w.name, w.description, w.inventory_level, 
-		    w.price, coalesce(w.image, ''), w.created_at, w.updated_at
+		    w.price, coalesce(w.image, ''), plan_id, is_recurring,  w.created_at, w.updated_at
 		from products.widgets w where id = $1`, id)
 	err := row.Scan(
 		&widget.ID,
@@ -120,6 +122,8 @@ func (m *DBModel) GetWidget(id int) (Widget, error) {
 		&widget.InventoryLevel,
 		&widget.Price,
 		&widget.Image,
+		&widget.PlanID,
+		&widget.IsRecurring,
 		&widget.CreatedAt,
 		&widget.UpdateAt,
 	)

@@ -1,0 +1,2 @@
+sql ("alter table products.widgets add column is_recurring bool default false")
+sql ("alter table products.widgets add column plan_id text default ''")

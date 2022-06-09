@@ -275,7 +275,9 @@ CREATE TABLE products.widgets (
     price integer,
     created_at date DEFAULT now(),
     updated_at date DEFAULT now(),
-    image text DEFAULT ''::text
+    image text DEFAULT ''::text,
+    is_recurring boolean DEFAULT false,
+    plan_id text DEFAULT ''::text
 );
 
 
